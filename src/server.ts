@@ -4,13 +4,12 @@ import cors from "cors";
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(cors());
+import { Request, Response } from "express";
 
 interface RoomParams {
   hotel_id: string;
   room_number: string;
 }
-
-app.use(express.json());
 
 // Set up the PostgreSQL connection
 const pool = new Pool({
@@ -251,6 +250,60 @@ app.post("/book-room", async (req, res) => {
     res.status(500).send("Error booking room");
   }
 });
+
+// POST route to add a new payment
+app.post("/payments", async (req: Request, res: Response) => {
+  console.log("Request Body:", req.body); // Add this line to log the body
+
+  const {
+    stay_id,
+    amount,
+    payment_method,
+    payment_date,
+    stay_type,
+    customer_id,
+  } = req.body;
+
+  try {
+    // Log the request body to ensure correct values are passed
+    console.log("Request body:", req.body);
+
+    // Insert payment data into the payments table
+    const result = await pool.query(
+      `INSERT INTO payments (stay_id, amount, payment_method, payment_date, stay_type, customer_id) 
+           VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [stay_id, amount, payment_method, payment_date, stay_type, customer_id]
+    );
+
+    // Optionally update the stay_type in the stay table
+    await pool.query(`UPDATE stay SET stay_type = $1 WHERE stay_id = $2`, [
+      stay_type,
+      stay_id,
+    ]);
+
+    res.status(201).json(result.rows[0]); // Return the payment details
+  } catch (err) {
+    console.error("Error adding payment", err);
+    res.status(500).send("Error adding payment");
+  }
+});
+
+// GET route to fetch all payments
+app.get("/payments", async (req, res) => {
+  try {
+    const result = await pool.query(`
+          SELECT payment_id, amount, payment_method, payment_date, stay_type, customer_id, stay_id 
+          FROM payments
+        `);
+    res.json(result.rows); // Send payment details as response
+  } catch (err) {
+    console.error("Error fetching payments", err);
+    res.status(500).send("Error fetching payments");
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+app.use(express.json());

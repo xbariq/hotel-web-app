@@ -3,11 +3,13 @@ import axios from "axios";
 import "../styles.css";
 
 const SearchRoom = () => {
+  const [role, setRole] = useState<string>("customer");
   const [roomCapacity, setRoomCapacity] = useState<number | "">("");
   const [price, setPrice] = useState<number | "">("");
   const [startDate, setStartDate] = useState<string | "">("");
   const [endDate, setEndDate] = useState<string | "">("");
   const [rooms, setRooms] = useState<any[]>([]);
+  const [bookingId, setBookingId] = useState<number | null>(null);
 
   const handleSearch = async () => {
     const queryParams: any = {};
@@ -31,7 +33,6 @@ const SearchRoom = () => {
     try {
       console.log("Search Params:", queryParams);
 
-      // Make API request with the selected filters
       const response = await axios.get("http://localhost:3000/rooms", {
         params: queryParams,
       });
@@ -41,10 +42,40 @@ const SearchRoom = () => {
     }
   };
 
+  const handleAction = async (room_number: string) => {
+    if (role === "customer") {
+      try {
+        const response = await axios.post("http://localhost:3000/book-room", {
+          room_number,
+          startDate,
+          endDate,
+          customer_id: 1,
+        });
+        console.log("Booking response:", response.data);
+        setBookingId(response.data.stay_id);
+      } catch (error) {
+        console.error("Error booking room:", error);
+      }
+    } else if (role === "employee" && bookingId) {
+      // Convert a booking into renting or process renting directly
+      try {
+        const response = await axios.post("http://localhost:3000/rent-room", {
+          booking_id: bookingId,
+          room_number,
+          customer_id: 1,
+        });
+        console.log("Renting response:", response.data);
+      } catch (error) {
+        console.error("Error renting room:", error);
+      }
+    }
+  };
+
   return (
     <div className="search-room-container">
-      <h2>Hotel Web App</h2>
       <h3>Search Rooms</h3>
+
+      {/* Role Selection */}
 
       {/* Room Search Form */}
       <form>
@@ -107,8 +138,22 @@ const SearchRoom = () => {
                   </h4>
                 </div>
                 <div className="room-actions">
-                  <button className="book-button">Book</button>
-                  <button className="rent-button">Rent</button>
+                  {role === "customer" && (
+                    <button
+                      className="book-button"
+                      onClick={() => handleAction(room.room_number)}
+                    >
+                      Book
+                    </button>
+                  )}
+                  {role === "employee" && (
+                    <button
+                      className="rent-button"
+                      onClick={() => handleAction(room.room_number)}
+                    >
+                      Rent
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
