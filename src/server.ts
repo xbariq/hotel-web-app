@@ -147,12 +147,10 @@ app.delete("/hotels/:hotel_id", async (req, res) => {
 
 // GET route for searching available rooms
 app.get("/rooms", async (req, res) => {
-  const { roomCapacity, price, hotelChain, view, extendable } = req.query;
+  const { roomCapacity, price, startDate, endDate } = req.query;
 
   let query = `SELECT * FROM room WHERE 1=1`;
   let queryParams: any[] = [];
-
-  console.log("Query Parameters:", { roomCapacity, price });
 
   if (roomCapacity) {
     query += ` AND capacity >= $${queryParams.length + 1}`;
@@ -164,23 +162,21 @@ app.get("/rooms", async (req, res) => {
     queryParams.push(price);
   }
 
-  if (view) {
-    query += ` AND view = $${queryParams.length + 1}`;
-    queryParams.push(view);
+  // Check for rooms that are not booked during the specified date range
+  if (startDate && endDate) {
+    query += ` AND room_number NOT IN (
+        SELECT room_number
+        FROM stay
+        WHERE (start_date, end_date) OVERLAPS ($${queryParams.length + 1}, $${
+      queryParams.length + 2
+    })
+      )`;
+    queryParams.push(startDate, endDate);
   }
-
-  if (extendable) {
-    query += ` AND extendable = $${queryParams.length + 1}`;
-    queryParams.push(extendable);
-  }
-
-  console.log("Final Query:", query);
-  console.log("Query Params:", queryParams);
 
   try {
     const result = await pool.query(query, queryParams);
-    console.log("Rooms Found:", result.rows);
-    res.json(result.rows);
+    res.json(result.rows); // Return the filtered rooms as JSON
   } catch (err) {
     console.error("Error fetching rooms", err);
     res.status(500).send("Error fetching rooms");

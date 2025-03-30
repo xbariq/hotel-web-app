@@ -8,7 +8,7 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <h1>Hotel Web App</h1>
-      <HotelList /> {/* Display the list of hotels */}
+      {/* <HotelList /> {/* Display the list of hotels */}
       <SearchRoom />
     </div>
   );
