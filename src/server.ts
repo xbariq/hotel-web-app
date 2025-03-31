@@ -147,14 +147,14 @@ app.delete("/hotels/:hotel_id", async (req, res) => {
 
 // GET route for searching available rooms
 app.get("/rooms", async (req, res) => {
-  const { roomCapacity, price, startDate, endDate, view } = req.query;
+  const { roomCapacity, price, startDate, endDate, view, city } = req.query;
 
   let query = `
-      SELECT room.room_number, room.price, room.capacity, room.view, room.hotel_id, hotel.city
-      FROM room
-      JOIN hotel ON room.hotel_id = hotel.hotel_id
-      WHERE 1=1
-    `;
+        SELECT room.room_number, room.price, room.capacity, room.view, room.hotel_id, hotel.city
+        FROM room
+        JOIN hotel ON room.hotel_id = hotel.hotel_id
+        WHERE 1=1
+      `;
   let queryParams: any[] = [];
 
   // Filtering based on room capacity
@@ -175,15 +175,21 @@ app.get("/rooms", async (req, res) => {
     queryParams.push(`%${view}%`);
   }
 
+  // Filtering based on city
+  if (city) {
+    query += ` AND hotel.city ILIKE $${queryParams.length + 1}`;
+    queryParams.push(`%${city}%`);
+  }
+
   // Check for rooms that are not booked during the specified date range
   if (startDate && endDate) {
     query += ` AND room.room_number NOT IN (
-        SELECT room_number
-        FROM stay
-        WHERE (start_date, end_date) OVERLAPS ($${queryParams.length + 1}, $${
+          SELECT room_number
+          FROM stay
+          WHERE (start_date, end_date) OVERLAPS ($${queryParams.length + 1}, $${
       queryParams.length + 2
     })
-      )`;
+        )`;
     queryParams.push(startDate, endDate);
   }
 

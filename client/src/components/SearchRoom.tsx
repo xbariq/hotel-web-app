@@ -6,6 +6,8 @@ const SearchRoom = () => {
   const [role, setRole] = useState<string>("customer");
   const [roomCapacity, setRoomCapacity] = useState<number | "">("");
   const [price, setPrice] = useState<number | "">("");
+  const [city, setCity] = useState<string | "">("");
+  const [view, setView] = useState<string | "">("");
   const [startDate, setStartDate] = useState<string | "">("");
   const [endDate, setEndDate] = useState<string | "">("");
   const [rooms, setRooms] = useState<any[]>([]);
@@ -45,6 +47,13 @@ const SearchRoom = () => {
 
     if (endDate !== "") {
       queryParams.endDate = endDate;
+    }
+    if (city !== "") {
+      queryParams.city = city;
+    }
+
+    if (view !== "") {
+      queryParams.view = view;
     }
 
     try {
@@ -143,6 +152,24 @@ const SearchRoom = () => {
             type="date"
             value={endDate || ""}
             onChange={(e) => setEndDate(e.target.value)}
+          />
+        </div>
+        <div className="form-group">
+          <label>City:</label>
+          <input
+            type="text"
+            value={city || ""}
+            onChange={(e) => setCity(e.target.value)}
+            placeholder="Enter city"
+          />
+        </div>
+        <div className="form-group">
+          <label>View:</label>
+          <input
+            type="text"
+            value={view || ""}
+            onChange={(e) => setView(e.target.value)}
+            placeholder="Enter view (e.g., sea, mountain)"
           />
         </div>
         <button type="button" onClick={handleSearch}>
