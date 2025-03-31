@@ -147,24 +147,37 @@ app.delete("/hotels/:hotel_id", async (req, res) => {
 
 // GET route for searching available rooms
 app.get("/rooms", async (req, res) => {
-  const { roomCapacity, price, startDate, endDate } = req.query;
+  const { roomCapacity, price, startDate, endDate, view } = req.query;
 
-  let query = `SELECT * FROM room WHERE 1=1`;
+  let query = `
+      SELECT room.room_number, room.price, room.capacity, room.view, room.hotel_id, hotel.city
+      FROM room
+      JOIN hotel ON room.hotel_id = hotel.hotel_id
+      WHERE 1=1
+    `;
   let queryParams: any[] = [];
 
+  // Filtering based on room capacity
   if (roomCapacity) {
-    query += ` AND capacity >= $${queryParams.length + 1}`;
+    query += ` AND room.capacity >= $${queryParams.length + 1}`;
     queryParams.push(roomCapacity);
   }
 
+  // Filtering based on price
   if (price) {
-    query += ` AND price <= $${queryParams.length + 1}`;
+    query += ` AND room.price <= $${queryParams.length + 1}`;
     queryParams.push(price);
+  }
+
+  // Filtering based on view
+  if (view) {
+    query += ` AND room.view ILIKE $${queryParams.length + 1}`;
+    queryParams.push(`%${view}%`);
   }
 
   // Check for rooms that are not booked during the specified date range
   if (startDate && endDate) {
-    query += ` AND room_number NOT IN (
+    query += ` AND room.room_number NOT IN (
         SELECT room_number
         FROM stay
         WHERE (start_date, end_date) OVERLAPS ($${queryParams.length + 1}, $${
@@ -176,7 +189,7 @@ app.get("/rooms", async (req, res) => {
 
   try {
     const result = await pool.query(query, queryParams);
-    res.json(result.rows); // Return the filtered rooms as JSON
+    res.json(result.rows); // Return the filtered rooms with city info only
   } catch (err) {
     console.error("Error fetching rooms", err);
     res.status(500).send("Error fetching rooms");
@@ -273,6 +286,21 @@ app.post("/payments", async (req: Request, res: Response) => {
   }
 });
 
+app.get("/stays", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT s.stay_id, s.start_date, s.end_date, s.stay_type, s.room_number, s.hotel_id,
+                c.f_name, c.l_name
+         FROM stay s
+         LEFT JOIN hotel_customer c ON s.customer_id = c.customer_id`
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching stays", err);
+    res.status(500).send("Error fetching stays");
+  }
+});
+
 // GET route to fetch all payments
 app.get("/payments", async (req, res) => {
   try {
@@ -280,7 +308,7 @@ app.get("/payments", async (req, res) => {
           SELECT payment_id, amount, payment_method, payment_date, stay_type, customer_id, stay_id 
           FROM payments
         `);
-    res.json(result.rows); // Send payment details as response
+    res.json(result.rows);
   } catch (err) {
     console.error("Error fetching payments", err);
     res.status(500).send("Error fetching payments");
@@ -328,7 +356,7 @@ app.post("/hotel_customers", async (req, res) => {
 app.get("/hotel_customers", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM hotel_customer");
-    res.json(result.rows); // Return all customers as a response
+    res.json(result.rows);
   } catch (err) {
     console.error("Error fetching hotel customers", err);
     res.status(500).send("Error fetching hotel customers");

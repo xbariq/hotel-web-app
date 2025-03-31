@@ -168,57 +168,80 @@ button:hover {
 }
 
 /* Style for the View Payments section */
+/* Styling for the "View Payments" button */
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4caf50; /* Green background */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 10px auto;
+  display: block; /* Center the button horizontally */
+  width: auto; /* Let the button width auto adjust */
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+/* Container for the "View Payments" button */
 .view-payments-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Specific button styling */
+.view-payments-container button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4caf50; /* Green background */
+  color: white;
+  border: none;
+  width: 300px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 10px;
+  display: inline-block; /* Use inline-block to fit the content size */
+  transition: background-color 0.3s ease;
+}
+
+/* On hover */
+.view-payments-container button:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+/* Style for the payments table */
+.payments-table {
   width: 100%;
   margin-top: 20px;
-}
-
-.view-payments-header {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-.payments-table {
-  width: 80%;
   border-collapse: collapse;
-  margin-top: 20px;
-  margin-bottom: 20px;
 }
 
 .payments-table th,
 .payments-table td {
   padding: 10px;
-  text-align: left;
+  text-align: center;
   border: 1px solid #ddd;
 }
 
 .payments-table th {
   background-color: #f2f2f2;
+}
+
+.payments-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.success-message {
+  color: green;
   font-weight: bold;
-}
-
-.view-payments-btn {
-  padding: 10px 20px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  cursor: pointer;
+  text-align: center;
   margin-top: 20px;
-  font-size: 16px;
-  border-radius: 5px;
-  width: 200px;
-  align-self: center;
 }
 
-.view-payments-btn:hover {
-  background-color: #45a049;
-}
 /* Center the login form */
 .login-container {
   display: flex;

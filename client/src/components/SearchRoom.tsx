@@ -25,7 +25,6 @@ const SearchRoom = () => {
     registration_date: new Date().toISOString().split("T")[0],
   });
 
-  // New state for selected room number and hotel ID
   const [selectedRoomNumber, setSelectedRoomNumber] = useState<string>("");
   const [selectedHotelId, setSelectedHotelId] = useState<number | null>(null);
 
@@ -161,7 +160,8 @@ const SearchRoom = () => {
                 <div className="room-details">
                   <h4>
                     Room {room.room_number} - ${room.price} - Capacity:{" "}
-                    {room.capacity}
+                    {room.capacity} - View: {room.view} - Hotel City:{" "}
+                    {room.city}
                   </h4>
                 </div>
                 <div className="room-actions">
@@ -174,9 +174,6 @@ const SearchRoom = () => {
                     >
                       Book
                     </button>
-                  )}
-                  {role === "employee" && (
-                    <button className="rent-button">Rent</button>
                   )}
                 </div>
               </div>

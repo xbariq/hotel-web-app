@@ -46,7 +46,6 @@ const App: React.FC = () => {
         <div>
           <h3>Employee Dashboard</h3>
           <AddPayment />
-          <h3>View Payments</h3>
           <ViewPayments />
         </div>
       )}
