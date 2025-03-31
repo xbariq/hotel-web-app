@@ -2,7 +2,7 @@
 
 - Node.js (v14 or higher)
 - PostgreSQL
-- npm or yarn
+- Npm 
 
 
 ### Backend Setup
@@ -18,7 +18,28 @@
 
 Apply the SQL Schema:
 
-We will provide the hotel_database.sql file, which contains the necessary schema to set up the database tables. 
+We will provide the hotel_database.sql file, which contains the necessary schema to set up the database tables. After you create the database, execute the script we will provide you as it will create all the tables needed. 
+
+If the payment table is missing, right click on the database name, select run a query, run the following to create the payment table: 
+```
+
+-- Create the payments table to store payment details
+CREATE TABLE IF NOT EXISTS public.payments (
+  payment_id SERIAL PRIMARY KEY,          -- Unique ID for the payment
+  customer_id INTEGER NOT NULL,           -- Reference to the customer
+  amount DECIMAL(10, 2) NOT NULL,         -- Payment amount
+  payment_method VARCHAR(255),            -- Payment method (e.g., 'cash', 'credit card')
+  payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Date and time of payment
+  stay_type VARCHAR(50) CHECK (stay_type IN ('booking', 'renting')), -- Stay type
+  stay_id INTEGER,                        -- Reference to the stay record
+  FOREIGN KEY (customer_id) REFERENCES public.hotel_customer(customer_id) ON DELETE CASCADE, -- Reference to hotel_customer
+  FOREIGN KEY (stay_id) REFERENCES public.stay(stay_id) ON DELETE CASCADE -- Reference to stay table
+);
+
+
+```
+
+
 
 ### Configure PostgreSQL Connection
 In the project directory, navigate to src/server.ts and update the following details in the pool configuration to match your PostgreSQL setup:
@@ -47,7 +68,7 @@ You should see a message saying "Hello, Hotel Web App! Database connected at: [c
 
 ### Front-end Setup
 
-from hotel-web-app dir run the following commands in terminal:
+from hotel-web-app directory, run the following commands in terminal:
 ```bash
 - cd client
 - npm start
