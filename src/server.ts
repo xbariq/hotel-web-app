@@ -5,6 +5,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(cors());
 import { Request, Response } from "express";
+app.use(express.json());
 
 interface RoomParams {
   hotel_id: string;
@@ -235,22 +236,6 @@ app.delete("/rooms/:hotel_id/:room_number", async (req, res) => {
   }
 });
 
-app.post("/book-room", async (req, res) => {
-  const { room_number, hotel_id, startDate, endDate, customer_id } = req.body;
-
-  try {
-    const result = await pool.query(
-      `INSERT INTO bookings (room_number, hotel_id, start_date, end_date, customer_id) 
-        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [room_number, hotel_id, startDate, endDate, customer_id]
-    );
-    res.status(201).json(result.rows[0]);
-  } catch (err) {
-    console.error("Error booking room", err);
-    res.status(500).send("Error booking room");
-  }
-});
-
 // POST route to add a new payment
 app.post("/payments", async (req: Request, res: Response) => {
   console.log("Request Body:", req.body); // Add this line to log the body
@@ -302,8 +287,79 @@ app.get("/payments", async (req, res) => {
   }
 });
 
+app.post("/hotel_customers", async (req, res) => {
+  const {
+    f_name,
+    m_name,
+    l_name,
+    email,
+    street,
+    city,
+    state,
+    country,
+    code,
+    registration_date,
+  } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO hotel_customer (f_name, m_name, l_name, email, street, city, state, country, code, registration_date)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+      [
+        f_name,
+        m_name,
+        l_name,
+        email,
+        street,
+        city,
+        state,
+        country,
+        code,
+        registration_date,
+      ]
+    );
+    res.status(201).json(result.rows[0]); // Return the newly added customer
+  } catch (err) {
+    console.error("Error adding customer", err);
+    res.status(500).send("Error adding customer");
+  }
+});
+// GET route to fetch all hotel customers
+app.get("/hotel_customers", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM hotel_customer");
+    res.json(result.rows); // Return all customers as a response
+  } catch (err) {
+    console.error("Error fetching hotel customers", err);
+    res.status(500).send("Error fetching hotel customers");
+  }
+});
+
+// POST route to create a stay
+app.post("/stays", async (req, res) => {
+  const {
+    start_date,
+    end_date,
+    stay_type,
+    customer_id,
+    room_number,
+    hotel_id,
+  } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO stay (start_date, end_date, stay_type, customer_id, room_number, hotel_id)
+         VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [start_date, end_date, stay_type, customer_id, room_number, hotel_id]
+    );
+
+    res.status(201).json(result.rows[0]); // Return the newly created stay record
+  } catch (err) {
+    console.error("Error adding stay", err);
+    res.status(500).send("Error adding stay");
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
-app.use(express.json());

@@ -11,9 +11,8 @@ const AddPayment = () => {
 
   const [message, setMessage] = useState<string>("");
 
-  // Function to handle payment submission
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent the default form submission behavior
+    e.preventDefault();
 
     if (
       !stayId ||
