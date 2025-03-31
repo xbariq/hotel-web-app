@@ -159,9 +159,13 @@ const SearchRoom = () => {
               <div className="room-item" key={room.room_number}>
                 <div className="room-details">
                   <h4>
-                    Room {room.room_number} - ${room.price} - Capacity:{" "}
-                    {room.capacity} - View: {room.view} - Hotel City:{" "}
-                    {room.city}
+                    <ul>
+                      <li>Room Number: {room.room_number}</li>
+                      <li>Price: ${room.price}</li>
+                      <li>Capacity: {room.capacity}</li>
+                      <li>View: {room.view}</li>
+                      <li>Hotel City: {room.city}</li>
+                    </ul>
                   </h4>
                 </div>
                 <div className="room-actions">

@@ -49,8 +49,9 @@ form button:hover {
   background-color: #4cae4c;
 }
 
+/* Available Rooms Container */
 .available-rooms {
-  max-width: 600px;
+  max-width: 700px;
   margin: 20px auto;
   background-color: #fff;
   padding: 20px;
@@ -58,25 +59,66 @@ form button:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-ul {
+.rooms-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.room-item {
+  display: flex;
+  flex-direction: column; /* Stack details vertically */
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.room-item:hover {
+  transform: scale(1.02); /* Slight hover effect */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.room-details ul {
   list-style-type: none;
-  padding: 0;
+  padding-left: 0;
 }
 
-li {
-  padding: 10px;
-  background-color: #f9f9f9;
+.room-details li {
+  font-size: 1rem;
+  margin-bottom: 8px;
+  font-weight: normal;
+  color: #333;
+}
+
+.room-details li::before {
+  content: "➤ ";
+  color: #007bff;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.room-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 15px;
+}
+
+.book-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
   border-radius: 5px;
-  margin-bottom: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-li:last-child {
-  margin-bottom: 0;
-}
-
-p {
-  text-align: center;
-  color: #777;
+.book-button:hover {
+  background-color: #0056b3;
 }
 
 .search-room-container {
@@ -124,30 +166,6 @@ button:hover {
   background-color: #218838;
 }
 
-.rooms-container {
-  margin-top: 20px;
-}
-
-.rooms-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.room-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  background-color: #f8f9fa;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-}
-
-.room-actions {
-  display: flex;
-  gap: 10px;
-}
-
 .book-button,
 .rent-button {
   padding: 8px 12px;
@@ -161,10 +179,6 @@ button:hover {
 .book-button:hover,
 .rent-button:hover {
   background-color: #0056b3;
-}
-
-.room-details h4 {
-  margin: 0;
 }
 
 /* Style for the View Payments section */
